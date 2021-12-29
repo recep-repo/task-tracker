@@ -12,33 +12,40 @@ function App() {
 
   const baseUrl = "http://localhost:5000/tasks"
 
+
+
   const fetchTasks = async () => {
-    const{data} = await axios.get(baseUrl)
+    const {data} = await axios.get(baseUrl)
     setTasks(data)
+    
   }
   useEffect(() => {
     fetchTasks()
   }, [])
 
-  //Delete Task
-  const deleteTask = (deleteTaskId) => {
-    setTasks(tasks.filter((task)=> task.id !== deleteTaskId))
+
+  const addTask = async (newTask) => {
+    await axios.post(baseUrl, newTask)
+    fetchTasks()
   }
 
-  //Add Task
-  const addTask = (newTask) => {
-    const id = Math.floor(Math.random() *100) +1
-    const addNewTask = {id, ...newTask}
-    setTasks([...tasks, addNewTask])
+  const deleteTask =async (deletedTaskId) => {
+    await axios.delete(`${baseUrl}/${deletedTaskId}`)
+    fetchTasks()
   }
 
-  //Toggle done
-  const toggleDone = (toggleDoneId) =>  {
-    setTasks(
-      tasks.map((task) => 
-      task.id === toggleDoneId ? {...task, isDone: !task.isDone}: task)
-    )
+  const toggleDone = async (toggleDoneId) => {
+    const {data} = await axios.get(`${baseUrl}/${toggleDoneId}`)
+    const updateTask = {...data, isDone: !data.isDone}
+    await axios.put(`${baseUrl}/${toggleDoneId}`, updateTask)
+    fetchTasks()
+    
+
   }
+
+
+
+
   //Show add task
   const toggleShow = () => setShowAddTask(!showAddTask)
 
